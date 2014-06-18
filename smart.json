@@ -1,0 +1,13 @@
+{
+  "name": "Voting",
+  "description": "Provides voting/rating/counting functionality for one item of a collection rating/counting an item of the same or different collection.",
+  "homepage": "",
+  "author": "Sven Buschbeck",
+  "version": "1.0.0",
+  "git": "",
+  "packages": {
+    "tools": {
+      "path": "../tools"
+     }
+  }
+}
