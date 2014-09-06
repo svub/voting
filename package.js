@@ -1,16 +1,11 @@
 Package.describe({
-  summary: "Provides voting/rating/counting functionality for one item of a collection rating/counting an item of the same or different collection."
+  summary: "Keeps track of the rotation of the device and updates the html tag's class attribute and Meteor.isLandscapeMode"
 });
 
 Package.on_use(function (api, where) {
-  if(api.export) { api.export('voting'); }
+  if(api.export) { api.export('rotationDetector'); }
   
-  common = ['client', 'server'];
-
-  
-  api.use(['underscore', 'coffeescript', 'underscore-string-latest', 'meteor', 'templating', 'ejson', 'mongo-livedata', 'deps'], common);
-  api.use(['minimongo', 'less'], 'client');  
-
-  api.add_files('voting.coffee', common);
+  api.use(['underscore', 'coffeescript', 'meteor', 'jquery'], 'client');
+  api.add_files('rotation-detector.coffee', 'client');
 
 });
