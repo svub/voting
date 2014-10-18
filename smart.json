@@ -1,9 +1,13 @@
 {
-  "name": "Rotation Detector",
-  "description": "Keeps track of the rotation of the device and updates the html tag's class attribute and Meteor.isLandscapeMode.",
-  "homepage": "",
-  "author": "Sven Buschbeck",
-  "version": "1.0.0",
-  "git": "",
-  "packages": {}
+    "name": "Voting",
+    "description": "Provides voting/rating/counting functionality for one item of a collection rating/counting an item of the same or different collection.",
+    "homepage": "https://github.com/svub/voting",
+    "author": "Sven Buschbeck",
+    "version": "1.1.0",
+    "git": "https://github.com/svub/voting.git",
+    "packages": {
+        "tools": {
+            "path": "../tools"
+        }
+    }
 }
