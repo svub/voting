@@ -1,4 +1,5 @@
 class CommonVoting
+  @all: allVotings = []
   # helpers
   log: log ? (obj) ->
     console?.log obj
@@ -6,6 +7,9 @@ class CommonVoting
   logmr: logmr ? (msg, obj) ->
     @log msg
     @log obj
+  logvmr: (method, msg, obj) -> @logmr "Voting #{@name}.#{method}: #{msg}", obj
+  logvr: (method, obj) -> @logmr "Voting #{@name}.#{method}", obj
+  logv: (method, msg) -> @log "Voting #{@name}.#{method}: #{msg}"
   createObject: createObject ? ->
     object = {}
     for o,i in arguments
@@ -13,6 +17,7 @@ class CommonVoting
     object
 
   constructor: (@name, @targets, @source, @fields={}) ->
+    @logv 'init', '...'
     check @name, String
     check @targets?.find, Match.OptionalOrNull Function
     check @source?.find, Match.OptionalOrNull Function
@@ -22,6 +27,9 @@ class CommonVoting
     if _.isEmpty @fields
       @fields.up   = 'votesUp'
       @fields.down = 'votesDown'
+    @protectFields()
+    allVotings.push @
+    @logv 'init', 'done'
 
   # Get targets/voted sorted by count
   _getListName: (source = true, up = true) ->
@@ -42,6 +50,42 @@ class CommonVoting
       _.contains (u.getValue source, sourceListName), target?._id ? target
     else if (_.isObject target) and (targetListName = @_getListName false, up)?
       _.contains (u.getValue target, targetListName), source?._id ? source
+  targetFields: -> [@fields.up, @fields.down, @fields.targetListUp, @fields.targetListDown]
+  sourceFields: -> [@fields.sourceListUp, @fields.sourceListDown]
+  protectFields: ->
+    #deny = (collection, fieldsToCheck) =>
+    #  if (fieldsToCheck = _.compact fieldsToCheck).length > 0
+    #    @logvmr 'deny', "fieldsToCheck on #{collection._name}", fieldsToCheck
+    #    collection?.deny
+    #      update: (userId, doc, fields, modifier) =>
+    #        @logvmr 'deny.update', "fields", fields
+    #        @logvr 'deny.update', (_.intersection fields, fieldsToCheck).length > 0
+    #      fetch: []
+    #deny @targets, @targetFields()
+    #deny @source,  @sourceFields()
+    u.protectCollection @targets, @targetFields()
+    u.protectCollection @source,  @sourceFields()
+
+  initObject: (object, belongingToCollection, overwriteExisting) ->
+    initFields = (fields, value) -> for field in fields
+      if field? and (overwriteExisting or not (u.getValue object, field)?)
+        u.setValue object, field, value
+    if belongingToCollection is @targets
+      initFields [@fields.up, @fields.down], 0
+      initFields [@fields.targetListUp, @fields.targetListDown], []
+    if belongingToCollection is @source
+      initFields [@fields.sourceListUp, @fields.sourceListDown], []
+  @initObject: (object, belongingToCollection, overwriteExisting) ->
+    for voting in @all
+      voting.initObject object, belongingToCollection, overwriteExisting
+  clearObject: (object, belongingToCollection) ->
+    clearFields = (fields) ->
+      u.unsetValue object, field for field in _.compact fields
+    clearFields @targetFields() if belongingToCollection is @targets
+    clearFields @sourceFields() if belongingToCollection is @source
+  @clearObject: (object, belongingToCollection, overwriteExisting) ->
+    for voting in @all
+      voting.clearObject object, belongingToCollection, overwriteExisting
 
 # the server-side links to a collection to store the actual votes
 class ServerVoting extends CommonVoting
