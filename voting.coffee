@@ -17,7 +17,7 @@ class CommonVoting
     object
 
   constructor: (@name, @targets, @source, @fields={}) ->
-    @logv 'init', '...'
+    #@logv 'init', '...'
     check @name, String
     check @targets?.find, Match.OptionalOrNull Function
     check @source?.find, Match.OptionalOrNull Function
@@ -29,7 +29,7 @@ class CommonVoting
       @fields.down = 'votesDown'
     @protectFields()
     allVotings.push @
-    @logv 'init', 'done'
+    #@logv 'init', 'done'
 
   # Get targets/voted sorted by count
   _getListName: (source = true, up = true) ->
@@ -190,4 +190,4 @@ class ClientVoting extends CommonVoting
       votedUp: -> votedClass @, true
       votedDown: -> votedClass @, false
 
-Meteor.Voting = if Meteor.isServer then ServerVoting else ClientVoting
+Meteor.Voting = Mongo.Relation = if Meteor.isServer then ServerVoting else ClientVoting
